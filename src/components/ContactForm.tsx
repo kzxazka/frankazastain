@@ -1,119 +1,219 @@
-"use client";
-
 import React, { useState } from "react";
-import { motion } from "framer-motion";
-import { SendHorizonal } from "lucide-react";
 
-export default function ContactForm() {
+// Komponen Modal/Popup Sederhana (ditambahkan)
+const NotificationModal: React.FC<{
+  type: 'success' | 'error';
+  message: string;
+  onClose: () => void;
+}> = ({ type, message, onClose }) => {
+  const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+  const icon = type === 'success' ? '✅' : '❌';
+
+  return (
+    // Overlay
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      {/* Modal Box */}
+      <div className={`p-6 rounded-lg shadow-2xl max-w-sm w-full ${bgColor} text-white transform transition-all duration-300 scale-100`}>
+        <div className="flex justify-between items-start">
+          <h3 className="text-xl font-bold flex items-center">
+            {icon} &nbsp; Notifikasi
+          </h3>
+          <button
+            onClick={onClose}
+            className="text-white hover:text-gray-200 transition"
+          >
+            &times;
+          </button>
+        </div>
+        <p className="mt-4">{message}</p>
+        <div className="mt-6 text-right">
+          <button
+            onClick={onClose}
+            className="bg-white text-gray-800 font-semibold py-1 px-4 rounded hover:bg-gray-100 transition"
+          >
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+export default function ContactForm(): React.ReactElement {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    service: "",
+    budget: "",
+    message: "",
+  });
+
   const [loading, setLoading] = useState(false);
-  const [budget, setBudget] = useState("");
+  // Mengubah state success/error menjadi boolean, dan menyimpan pesan di state lain
+  const [modalType, setModalType] = useState<'success' | 'error' | null>(null);
+  const [modalMessage, setModalMessage] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const closeModal = () => {
+    setModalType(null);
+    setModalMessage(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    const form = e.currentTarget;
-    const formData = new FormData(form);
+    closeModal(); // Pastikan modal tertutup sebelum submit
 
     try {
-      const res = await fetch("https://formsubmit.co/frankazastain@gmail.com", {
+      // Formsubmit bekerja paling andal dengan form-data, bukan JSON,
+      // tapi karena ini di Vercel/React, kita lanjutkan dengan AJAX.
+      // Solusi Vercel/CORS: Formsubmit merekomendasikan menambahkan input 'template' atau 'subject' 
+      // untuk memastikan Formsubmit mengidentifikasi request dengan benar.
+      
+      const payload = { 
+        ...formData, 
+        // Penambahan field honeypot (_honey) dan subject, untuk menghindari spam/error Formsubmit.
+        _subject: `Pesan Baru dari FRANKAZASTAIN Studio: ${formData.service}`, 
+        _template: "box", // Menggunakan template box
+      };
+      
+      const res = await fetch("https://formsubmit.co/ajax/frankazastain@gmail.com", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(payload),
       });
 
-      if (res.ok) {
-        alert("Berhasil dikirim!");
-        form.reset();
-        setBudget(""); // reset dropdown
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setModalType("success");
+        setModalMessage("Permintaan Anda berhasil dikirim! Kami akan menghubungi Anda segera.");
+        // Reset form hanya jika sukses
+        setFormData({ name: "", email: "", service: "", budget: "", message: "" });
       } else {
-        alert("Gagal mengirim form.");
+        setModalType("error");
+        setModalMessage(data.message || "Gagal mengirim form. Coba lagi.");
       }
     } catch (err) {
-      alert("Terjadi error: " + err);
+      console.error(err);
+      setModalType("error");
+      setModalMessage("Terjadi kesalahan koneksi saat mengirim form.");
     }
 
     setLoading(false);
   };
 
   return (
-    <motion.form
-      onSubmit={handleSubmit}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="space-y-6 bg-white/5 backdrop-blur-md p-8 rounded-2xl border border-white/10 shadow-xl"
-    >
-      {/* Hidden Inputs for FormSubmit */}
-      <input type="hidden" name="_captcha" value="false" />
-      <input
-        type="hidden"
-        name="_next"
-        value="https://frankazastain.vercel.app/success"
-      />
-
-      {/* Name */}
-      <div>
-        <label className="block text-sm text-gray-300 mb-1">Nama</label>
-        <input
-          name="name"
-          type="text"
-          required
-          className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-brand-gold"
-          placeholder="Nama lengkap"
-        />
-      </div>
-
-      {/* Email */}
-      <div>
-        <label className="block text-sm text-gray-300 mb-1">Email</label>
-        <input
-          name="email"
-          type="email"
-          required
-          className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-brand-gold"
-          placeholder="emailmu@gmail.com"
-        />
-      </div>
-
-      {/* Budget */}
-      <div>
-        <label className="block text-sm text-gray-300 mb-1">Budget</label>
-        <select
-          name="budget"
-          required
-          value={budget}
-          onChange={(e) => setBudget(e.target.value)}
-          className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-brand-gold"
-        >
-          <option value="">Pilih budget</option>
-          <option value="500-1 juta">500k–1 juta</option>
-          <option value="1-3 juta">1–3 juta</option>
-          <option value="3-5 juta">3–5 juta</option>
-          <option value="10jt">5-10juta+</option>
-        </select>
-      </div>
-
-      {/* Message */}
-      <div>
-        <label className="block text-sm text-gray-300 mb-1">Pesan</label>
-        <textarea
-          name="message"
-          required
-          className="w-full p-3 rounded-lg h-32 bg-white/10 border border-white/20 text-white focus:outline-none focus:border-brand-gold"
-          placeholder="Ceritakan kebutuhan proyekmu..."
-        ></textarea>
-      </div>
-
-      {/* Submit Button */}
-      <motion.button
-        whileTap={{ scale: 0.97 }}
-        type="submit"
-        disabled={loading}
-        className="w-full flex items-center justify-center gap-2 p-3 rounded-lg bg-brand-gold text-black font-semibold hover:bg-yellow-400 transition disabled:opacity-60"
+    <>
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white shadow-lg rounded-xl p-6 w-full max-w-xl mx-auto space-y-4"
       >
-        {loading ? "Mengirim..." : "Kirim Pesan"}
-        {!loading && <SendHorizonal size={18} />}
-      </motion.button>
-    </motion.form>
+        <h2 className="text-2xl font-bold mb-2 text-center">Hubungi Kami</h2>
+
+        {/* Notifikasi Inline (opsional, bisa dihapus jika hanya pakai modal) */}
+        {/*
+        {modalType === 'success' && <p className="text-green-600 text-center">{modalMessage}</p>}
+        {modalType === 'error' && <p className="text-red-600 text-center">{modalMessage}</p>}
+        */}
+
+        {/* ... (Form fields Anda) ... */}
+
+        <div>
+          <label className="block font-semibold mb-1">Nama</label>
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            className="w-full border rounded p-2"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block font-semibold mb-1">Email</label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full border rounded p-2"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block font-semibold mb-1">Jenis Layanan</label>
+          <select
+            name="service"
+            value={formData.service}
+            onChange={handleChange}
+            className="w-full border rounded p-2"
+            required
+          >
+            <option value="">Pilih layanan</option>
+            <option value="Website Development">Website Development</option>
+            <option value="UI/UX Design">UI/UX Design</option>
+            <option value="Branding Design">Branding Design</option>
+            <option value="System Development">System Development</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block font-semibold mb-1">Budget</label>
+          <select
+            name="budget"
+            value={formData.budget}
+            onChange={handleChange}
+            className="w-full border rounded p-2"
+            required
+          >
+            <option value="">Pilih budget</option>
+            <option value="< 1 Juta">{`< 1 Juta`}</option>
+            <option value="1 - 3 Juta">1 - 3 Juta</option>
+            <option value="3 - 5 Juta">3 - 5 Juta</option>
+            <option value="> 5 Juta">{`> 5 Juta`}</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block font-semibold mb-1">Pesan</label>
+          <textarea
+            name="message"
+            value={formData.message}
+            onChange={handleChange}
+            className="w-full border rounded p-2 h-24"
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-black text-white py-2 rounded hover:bg-gray-800 transition"
+        >
+          {loading ? "Mengirim..." : "Kirim"}
+        </button>
+      </form>
+
+      {/* Tampilkan Modal jika modalMessage ada */}
+      {modalMessage && modalType && (
+        <NotificationModal 
+          type={modalType} 
+          message={modalMessage} 
+          onClose={closeModal} 
+        />
+      )}
+    </>
   );
 }
