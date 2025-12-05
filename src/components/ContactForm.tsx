@@ -43,7 +43,7 @@ const ContactForm: React.FC = () => {
           
           {/* Hidden Fields: Anti-Spam dan Redirect Setelah Kirim */}
           <input type="hidden" name="_captcha" value="false" />
-          <input type="hidden" name="_next" value="/thanks.html" />
+          <input type="hidden" name="_next" value="https://frankazastain.vercel.app/thanks.html" />
           <input type="hidden" name="_subject" value="Permintaan Proyek Baru dari Website" />
 
           {/* Nama + Email */}
