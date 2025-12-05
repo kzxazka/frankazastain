@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terima Kasih! - FRANKAZASTAIN Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        /* Definisi Warna Brand untuk Tailwind */
+        :root {
+            --color-black: #0F0F0F;
+            --color-accent: #8A2BE2; /* Ungu Elegan */
+        }
+        
+        .bg-brand-dark {
+            background-color: var(--color-black);
+        }
+        
+        .text-brand-accent {
+            color: var(--color-accent);
+        }
+
+        .bg-brand-accent {
+            background-color: var(--color-accent);
+        }
+        
+        /* Tambahkan Font yang Sama dengan Aplikasi Utama (Poppins) */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Animasi Sederhana */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.8s ease-out;
+        }
+    </style>
+
+</head>
+<body class="bg-brand-dark text-white min-h-screen flex items-center justify-center">
+
+    <div class="max-w-xl text-center p-8 md:p-12 bg-white/5 border border-purple-600/20 rounded-2xl shadow-2xl animate-fadeIn">
+        
+        <i class="fas fa-check-circle text-brand-accent text-6xl mb-6"></i>
+        
+        <h1 class="text-3xl md:text-4xl font-extrabold mb-4">
+            Permintaan Anda <span class="text-brand-accent">Telah Diterima!</span>
+        </h1>
+        
+        <p class="text-gray-300 mb-8 leading-relaxed">
+            Terima kasih telah menghubungi **FRANKAZASTAIN Studio**. Kami telah menerima detail proyek Anda.
+        </p>
+
+        <div class="bg-black/30 border border-purple-600/30 rounded-lg p-4 mb-8">
+            <p class="text-sm font-semibold text-purple-400 mb-2">Langkah Selanjutnya:</p>
+            <ul class="text-left text-gray-400 space-y-2 text-sm">
+                <li><i class="fas fa-clock mr-3 text-purple-600"></i> Tim kami sedang meninjau detail proyek Anda.</li>
+                <li><i class="fab fa-whatsapp mr-3 text-purple-600"></i> Kami akan menghubungi Anda melalui **WhatsApp** dalam waktu 1x24 jam.</li>
+                <li><i class="fas fa-envelope mr-3 text-purple-600"></i> Pastikan email Anda (**frankazastain@gmail.com**) sudah terverifikasi di Formsubmit!</li>
+            </ul>
+        </div>
+        
+        <a 
+            href="/" 
+            class="inline-flex items-center justify-center space-x-2 bg-brand-accent text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:bg-purple-700 transition duration-300 transform active:scale-95"
+        >
+            <i class="fas fa-home"></i> 
+            <span>Kembali ke Beranda</span>
+        </a>
+
+    </div>
+
+</body>
+</html>

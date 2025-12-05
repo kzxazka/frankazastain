@@ -1,224 +1,179 @@
-import React, { useState } from "react";
+import React from 'react';
+// Asumsi Anda menggunakan Lucide-React (seperti di kode lama Anda)
+import { Send, Paperclip } from 'lucide-react';
+// Asumsi Anda menggunakan Framer Motion (seperti di kode lama Anda)
+import { motion } from 'framer-motion'; 
 
-// Definisikan warna aksen (sesuaikan dengan CSS global Anda, misal #8A2BE2)
-// Di Tailwind, kita gunakan warna terdekat: 'purple-500' atau 'indigo-400'
-const ACCENT_COLOR = 'text-purple-400';
-const ACCENT_BORDER = 'border-purple-500';
+// Konstanta Styling (Menggantikan Tailwind default di form lama)
+const BRAND_PURPLE = 'purple-600'; // Warna aksen utama
 
-// Komponen Modal/Popup Sederhana (tetap sama)
-const NotificationModal: React.FC<{
-  type: 'success' | 'error';
-  message: string;
-  onClose: () => void;
-}> = ({ type, message, onClose }) => {
-  const bgColor = type === 'success' ? 'bg-purple-500' : 'bg-red-500';
-  const icon = type === 'success' ? '✅' : '❌';
-
+const ContactForm: React.FC = () => {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-      <div className={`p-6 rounded-xl shadow-2xl max-w-sm w-full ${bgColor} text-white transform transition-all duration-300 scale-100`}>
-        <div className="flex justify-between items-start">
-          <h3 className="text-xl font-bold flex items-center">
-            {icon} &nbsp; Notifikasi
-          </h3>
+    <section id="contact" className="py-24 bg-black relative overflow-hidden text-white">
+      {/* Background Gradient & Blur Effect (dipertahankan) */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[100px] pointer-events-none" />
+
+      <div className="max-w-4xl mx-auto px-6 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-3xl md:text-5xl font-serif font-bold mb-4">
+            Mulai Proyek <span className={`text-${BRAND_PURPLE}`}>Anda</span>
+          </h2>
+          <p className="text-gray-400">
+            Isi formulir di bawah ini dan biarkan kami mewujudkan visi Anda.
+          </p>
+        </motion.div>
+
+        {/* FORM MENGGUNAKAN METODE REDIRECT (PALING STABIL) */}
+        <motion.form
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          // --- KUNCI: MENGGUNAKAN ACTION DAN METHOD STANDAR ---
+          action="https://formsubmit.co/frankazastain@gmail.com"
+          method="POST"
+          encType="multipart/form-data" // Penting untuk field upload
+          className="bg-gray-900 border border-purple-600/20 rounded-3xl p-8 md:p-12 shadow-2xl backdrop-blur-sm"
+        >
+          
+          {/* Hidden Fields: Anti-Spam dan Redirect Setelah Kirim */}
+          <input type="hidden" name="_captcha" value="false" />
+          <input type="hidden" name="_next" value="/thanks.html" />
+          <input type="hidden" name="_subject" value="Permintaan Proyek Baru dari Website" />
+
+          {/* Nama + Email */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="space-y-2">
+              <label htmlFor="name" className="text-sm font-medium text-purple-400">Nama Lengkap</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                required
+                // Styling Premium Gelap
+                className="w-full bg-black/50 border border-purple-600/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all placeholder-gray-500"
+                placeholder="John Doe"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-sm font-medium text-purple-400">Email Address</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                className="w-full bg-black/50 border border-purple-600/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all placeholder-gray-500"
+                placeholder="john@example.com"
+              />
+            </div>
+          </div>
+
+          {/* WhatsApp + Service */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="space-y-2">
+              <label htmlFor="whatsapp" className="text-sm font-medium text-purple-400">Nomor WhatsApp</label>
+              <input
+                type="tel"
+                id="whatsapp"
+                name="whatsapp"
+                required
+                className="w-full bg-black/50 border border-purple-600/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all placeholder-gray-500"
+                placeholder="+62 812..."
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="service" className="text-sm font-medium text-purple-400">Jenis Layanan</label>
+              <select
+                id="service"
+                name="service"
+                required
+                // Styling Select: appearance-none penting untuk visual kustom
+                className="w-full bg-black/50 border border-purple-600/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all appearance-none"
+              >
+                <option value="" disabled selected hidden className="bg-gray-800">Pilih Layanan...</option>
+                <option value="Pembuatan Website" className="bg-gray-800">Pembuatan Website</option>
+                <option value="UI/UX Design" className="bg-gray-800">UI/UX Design</option>
+                <option value="Joki UI/UX / Tugas" className="bg-gray-800">Joki UI/UX / Tugas</option>
+                <option value="Graphic Design" className="bg-gray-800">Graphic Design</option>
+                <option value="Lainnya" className="bg-gray-800">Lainnya</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Budget */}
+          <div className="mb-6">
+            <label className="text-sm font-medium text-purple-400 mb-2 block">Perkiraan Budget</label>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {[
+                { val: '< 1 Juta', label: '< 1 Juta' },
+                { val: '1 - 2 Juta', label: '1 - 2 Juta' },
+                { val: '3 - 5 Juta', label: '3 - 5 Juta' },
+                { val: '> 5 Juta', label: '> 5 Juta' },
+              ].map((option) => (
+                <label
+                  key={option.val}
+                  // Radio Button Styling yang disempurnakan
+                  className={`cursor-pointer border-2 rounded-lg p-3 text-center text-sm transition-all text-gray-300 hover:border-${BRAND_PURPLE} has-[:checked]:border-${BRAND_PURPLE} has-[:checked]:bg-${BRAND_PURPLE}/20`}
+                >
+                  <input
+                    type="radio"
+                    name="budget"
+                    value={option.val}
+                    className="hidden"
+                    required
+                  />
+                  {option.label}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Deskripsi */}
+          <div className="space-y-2 mb-6">
+            <label htmlFor="description" className="text-sm font-medium text-purple-400">Deskripsi Proyek</label>
+            <textarea
+              id="description"
+              name="description"
+              rows={4}
+              required
+              className="w-full bg-black/50 border border-purple-600/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all placeholder-gray-500"
+              placeholder="Ceritakan detail kebutuhan proyek Anda..."
+            ></textarea>
+          </div>
+
+          {/* Upload */}
+          <div className="space-y-2 mb-8">
+            <label className="text-sm font-medium text-purple-400">Upload Referensi (Opsional)</label>
+            <div className="relative border-2 border-dashed border-purple-600/50 rounded-lg p-6 hover:border-purple-500 transition-colors text-center cursor-pointer group">
+              <input
+                type="file"
+                name="attachment"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              />
+              <Paperclip className={`mx-auto text-purple-400 group-hover:text-${BRAND_PURPLE} mb-2 transition-colors`} />
+              <p className="text-sm text-gray-400">Klik atau drag file ke sini (Max 10MB)</p>
+            </div>
+          </div>
+
+          {/* Submit Button */}
           <button
-            onClick={onClose}
-            className="text-white opacity-75 hover:opacity-100 transition text-2xl"
+            type="submit"
+            className={`w-full bg-gradient-to-r from-${BRAND_PURPLE} to-indigo-600 hover:from-indigo-600 hover:to-${BRAND_PURPLE} text-white font-bold py-4 rounded-lg shadow-lg transform transition-all active:scale-[0.98] flex items-center justify-center space-x-2`}
           >
-            &times;
+            <span>Kirim Permintaan</span>
+            <Send size={18} />
           </button>
-        </div>
-        <p className="mt-4">{message}</p>
-        <div className="mt-6 text-right">
-          <button
-            onClick={onClose}
-            className="bg-white text-gray-800 font-semibold py-1 px-4 rounded-full hover:bg-gray-100 transition"
-          >
-            Tutup
-          </button>
-        </div>
+        </motion.form>
       </div>
-    </div>
+    </section>
   );
 };
 
-
-export default function ContactForm(): React.ReactElement {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    service: "",
-    budget: "",
-    message: "",
-  });
-
-  const [loading, setLoading] = useState(false);
-  const [modalType, setModalType] = useState<'success' | 'error' | null>(null);
-  const [modalMessage, setModalMessage] = useState<string | null>(null);
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const closeModal = () => {
-    setModalType(null);
-    setModalMessage(null);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    closeModal(); 
-
-    try {
-      const payload = { 
-        ...formData, 
-        _subject: `Pesan Baru dari FRANKAZASTAIN Studio: ${formData.service}`, 
-        _template: "box", 
-      };
-      
-      const res = await fetch("https://formsubmit.co/ajax/frankazastain@gmail.com", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.success) {
-        setModalType("success");
-        setModalMessage("Permintaan Anda berhasil dikirim! Kami akan menghubungi Anda segera.");
-        setFormData({ name: "", email: "", service: "", budget: "", message: "" });
-      } else {
-        setModalType("error");
-        setModalMessage(data.message || "Gagal mengirim form. Coba lagi.");
-      }
-    } catch (err) {
-      console.error("Fetch Error:", err);
-      setModalType("error");
-      setModalMessage("Terjadi kesalahan koneksi saat mengirim form. Coba lagi!");
-    } finally {
-      setLoading(false); // RESET LOADING STATE
-    }
-  };
-
-  return (
-    <>
-      <form
-        onSubmit={handleSubmit}
-        // --- STYLING FORM DI SINI ---
-        className="bg-black border border-purple-500 shadow-2xl rounded-xl p-6 w-full max-w-xl mx-auto space-y-5"
-      >
-        <h2 className="text-3xl font-extrabold mb-4 text-white text-center">
-            Mulai <span className={ACCENT_COLOR}>Proyek</span> Anda
-        </h2>
-
-        {/* --- FIELD INPUT DI SINI --- */}
-        <div className="space-y-4">
-            {/* Nama */}
-            <div>
-              <label className={`block font-semibold mb-1 ${ACCENT_COLOR}`}>Nama Lengkap</label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                // Styling Input: BG gelap, text putih, border aksen
-                className={`w-full bg-gray-900 text-white border-2 ${ACCENT_BORDER} rounded-lg p-3 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition`}
-                placeholder="Nama Anda"
-                required
-              />
-            </div>
-
-            {/* Email */}
-            <div>
-              <label className={`block font-semibold mb-1 ${ACCENT_COLOR}`}>Email Aktif</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className={`w-full bg-gray-900 text-white border-2 ${ACCENT_BORDER} rounded-lg p-3 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition`}
-                placeholder="nama@email.com"
-                required
-              />
-            </div>
-
-            {/* Layanan */}
-            <div>
-              <label className={`block font-semibold mb-1 ${ACCENT_COLOR}`}>Jenis Layanan</label>
-              <select
-                name="service"
-                value={formData.service}
-                onChange={handleChange}
-                // Styling Select: Sama seperti input, ditambah arrow putih
-                className={`w-full bg-gray-900 text-white border-2 ${ACCENT_BORDER} rounded-lg p-3 appearance-none focus:outline-none focus:ring-2 focus:ring-purple-500 transition`}
-                required
-              >
-                <option value="" disabled className="text-gray-500 bg-gray-800">Pilih layanan...</option>
-                <option value="Website Development" className="bg-gray-800">Pembuatan Website</option>
-                <option value="UI/UX Design" className="bg-gray-800">UI/UX Design</option>
-                <option value="Joki UI/UX Tugas Kuliah" className="bg-gray-800">Joki UI/UX Tugas Kuliah</option>
-                <option value="Graphic Design" className="bg-gray-800">Graphic Design</option>
-              </select>
-            </div>
-
-            {/* Budget */}
-            <div>
-              <label className={`block font-semibold mb-1 ${ACCENT_COLOR}`}>Estimasi Budget</label>
-              <select
-                name="budget"
-                value={formData.budget}
-                onChange={handleChange}
-                className={`w-full bg-gray-900 text-white border-2 ${ACCENT_BORDER} rounded-lg p-3 appearance-none focus:outline-none focus:ring-2 focus:ring-purple-500 transition`}
-                required
-              >
-                <option value="" disabled className="text-gray-500 bg-gray-800">Pilih estimasi budget Anda...</option>
-                <option value="< 2 Juta" className="bg-gray-800">{`< 2 Juta`}</option>
-                <option value="2 - 5 Juta" className="bg-gray-800">2 - 5 Juta</option>
-                <option value="5 - 10 Juta" className="bg-gray-800">5 - 10 Juta</option>
-                <option value="> 10 Juta" className="bg-gray-800">{`> 10 Juta (Custom)`}</option>
-              </select>
-            </div>
-
-            {/* Pesan */}
-            <div>
-              <label className={`block font-semibold mb-1 ${ACCENT_COLOR}`}>Deskripsi Proyek</label>
-              <textarea
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                className={`w-full bg-gray-900 text-white border-2 ${ACCENT_BORDER} rounded-lg p-3 h-24 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition`}
-                placeholder="Jelaskan kebutuhan dan ekspektasi proyek Anda."
-                required
-              />
-            </div>
-        </div>
-
-        {/* Tombol Kirim */}
-        <button
-          type="submit"
-          disabled={loading}
-          // Styling Tombol: Aksen Ungu/Putih
-          className={`w-full bg-purple-600 text-white font-bold py-3 rounded-lg hover:bg-purple-700 transition duration-300 transform hover:scale-[1.01] ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
-        >
-          {loading ? "Mengirim..." : "Kirim Permintaan"}
-        </button>
-      </form>
-
-      {/* Tampilkan Modal */}
-      {modalMessage && modalType && (
-        <NotificationModal 
-          type={modalType} 
-          message={modalMessage} 
-          onClose={closeModal} 
-        />
-      )}
-    </>
-  );
-}
+export default ContactForm;
