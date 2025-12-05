@@ -99,12 +99,12 @@ export default function ContactForm(): React.ReactElement {
         setModalMessage(data.message || "Gagal mengirim form. Coba lagi.");
       }
     } catch (err) {
-      console.error(err);
+      console.error("Fetch Error:", err);
       setModalType("error");
-      setModalMessage("Terjadi kesalahan koneksi saat mengirim form.");
+      setModalMessage("Terjadi kesalahan koneksi saat mengirim form. Coba lagi!");
+    } finally {
+      setLoading(false); // RESET LOADING STATE
     }
-
-    setLoading(false);
   };
 
   return (
