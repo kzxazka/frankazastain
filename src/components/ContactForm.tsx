@@ -1,152 +1,119 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Send, Paperclip } from "lucide-react";
+import { SendHorizonal } from "lucide-react";
 
-const ContactForm: React.FC = () => {
+export default function ContactForm() {
+  const [loading, setLoading] = useState(false);
+  const [budget, setBudget] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    try {
+      const res = await fetch("https://formsubmit.co/frankazastain@gmail.com", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        alert("Berhasil dikirim!");
+        form.reset();
+        setBudget(""); // reset dropdown
+      } else {
+        alert("Gagal mengirim form.");
+      }
+    } catch (err) {
+      alert("Terjadi error: " + err);
+    }
+
+    setLoading(false);
+  };
+
   return (
-    <section id="contact" className="py-24 bg-brand-dark relative overflow-hidden">
-      {/* Background Gradient */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-purple/10 rounded-full blur-[100px] pointer-events-none" />
+    <motion.form
+      onSubmit={handleSubmit}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="space-y-6 bg-white/5 backdrop-blur-md p-8 rounded-2xl border border-white/10 shadow-xl"
+    >
+      {/* Hidden Inputs for FormSubmit */}
+      <input type="hidden" name="_captcha" value="false" />
+      <input
+        type="hidden"
+        name="_next"
+        value="https://frankazastain.vercel.app/success"
+      />
 
-      <div className="max-w-4xl mx-auto px-6 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-12"
-        >
-          <h2 className="text-3xl md:text-5xl font-serif font-bold mb-4">Mulai Proyek Anda</h2>
-          <p className="text-gray-400">Isi formulir di bawah ini dan biarkan kami mewujudkan visi Anda.</p>
-        </motion.div>
-
-        {/* FORM UNTUK FORMSUBMIT */}
-        <motion.form
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          action="https://formsubmit.co/frankazastain@gmail.com"
-          method="POST"
-          encType="multipart/form-data"
-          className="bg-white/5 border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl backdrop-blur-sm"
-        >
-          {/* Anti CAPTCHA */}
-          <input type="hidden" name="_captcha" value="false" />
-
-          {/* Redirect Berhasil */}
-          <input
-            type="hidden"
-            name="_next"
-            value="https://frankazastain.vercel.app/thanks.html"
-          />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div className="space-y-2">
-              <label htmlFor="name" className="text-sm font-medium text-gray-300">Nama Lengkap</label>
-              <input
-                type="text"
-                name="name"
-                required
-                className="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple transition-all"
-                placeholder="John Doe"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium text-gray-300">Email Address</label>
-              <input
-                type="email"
-                name="email"
-                required
-                className="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple transition-all"
-                placeholder="john@example.com"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div className="space-y-2">
-              <label htmlFor="whatsapp" className="text-sm font-medium text-gray-300">Nomor WhatsApp</label>
-              <input
-                type="tel"
-                name="whatsapp"
-                required
-                className="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple transition-all"
-                placeholder="+62 812..."
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">Jenis Layanan</label>
-              <select
-                name="service"
-                className="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple transition-all"
-              >
-                <option value="website">Pembuatan Website</option>
-                <option value="uiux">UI/UX Design</option>
-                <option value="joki">Joki UI/UX / Tugas</option>
-                <option value="graphic">Graphic Design</option>
-                <option value="other">Lainnya</option>
-              </select>
-            </div>
-          </div>
-
-          {/* BUDGET */}
-          <div className="mb-6">
-            <label className="text-sm font-medium text-gray-300 mb-2 block">Perkiraan Budget</label>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-
-              {[
-                { val: "small", label: "< 1 Juta" },
-                { val: "medium", label: "1 - 5 Juta" },
-                { val: "large", label: "5 - 10 Juta" },
-                { val: "enterprise", label: "> 10 Juta" },
-              ].map((o) => (
-                <label
-                  key={o.val}
-                  className="cursor-pointer border border-white/10 hover:border-white/30 rounded-lg p-3 text-center text-sm text-gray-400 transition-all"
-                >
-                  <input type="radio" name="budget" value={o.val} className="hidden" />
-                  {o.label}
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* DESCRIPTION */}
-          <div className="space-y-2 mb-6">
-            <label className="text-sm font-medium text-gray-300">Deskripsi Proyek</label>
-            <textarea
-              name="description"
-              rows={4}
-              required
-              className="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple transition-all"
-              placeholder="Ceritakan detail kebutuhan proyek Anda..."
-            ></textarea>
-          </div>
-
-          {/* FILE UPLOAD */}
-          <div className="space-y-2 mb-8">
-            <label className="text-sm font-medium text-gray-300">Upload Referensi (Opsional)</label>
-            <div className="relative border-2 border-dashed border-white/10 rounded-lg p-6 hover:border-brand-purple/50 transition-colors text-center cursor-pointer group">
-              <input type="file" name="attachment" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-              <Paperclip className="mx-auto text-gray-400 group-hover:text-brand-purple mb-2 transition-colors" />
-              <p className="text-sm text-gray-500">Klik atau drag file ke sini</p>
-            </div>
-          </div>
-
-          {/* BUTTON */}
-          <button
-            type="submit"
-            className="w-full bg-gradient-to-r from-brand-purple to-indigo-600 hover:from-indigo-600 hover:to-brand-purple text-white font-bold py-4 rounded-lg shadow-lg transform transition-all active:scale-[0.98] flex items-center justify-center space-x-2"
-          >
-            <span>Kirim Permintaan</span>
-            <Send size={18} />
-          </button>
-        </motion.form>
+      {/* Name */}
+      <div>
+        <label className="block text-sm text-gray-300 mb-1">Nama</label>
+        <input
+          name="name"
+          type="text"
+          required
+          className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-brand-gold"
+          placeholder="Nama lengkap"
+        />
       </div>
-    </section>
-  );
-};
 
-export default ContactForm;
+      {/* Email */}
+      <div>
+        <label className="block text-sm text-gray-300 mb-1">Email</label>
+        <input
+          name="email"
+          type="email"
+          required
+          className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-brand-gold"
+          placeholder="emailmu@gmail.com"
+        />
+      </div>
+
+      {/* Budget */}
+      <div>
+        <label className="block text-sm text-gray-300 mb-1">Budget</label>
+        <select
+          name="budget"
+          required
+          value={budget}
+          onChange={(e) => setBudget(e.target.value)}
+          className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-brand-gold"
+        >
+          <option value="">Pilih budget</option>
+          <option value="500-1 juta">500k–1 juta</option>
+          <option value="1-3 juta">1–3 juta</option>
+          <option value="3-5 juta">3–5 juta</option>
+          <option value="10jt">5-10juta+</option>
+        </select>
+      </div>
+
+      {/* Message */}
+      <div>
+        <label className="block text-sm text-gray-300 mb-1">Pesan</label>
+        <textarea
+          name="message"
+          required
+          className="w-full p-3 rounded-lg h-32 bg-white/10 border border-white/20 text-white focus:outline-none focus:border-brand-gold"
+          placeholder="Ceritakan kebutuhan proyekmu..."
+        ></textarea>
+      </div>
+
+      {/* Submit Button */}
+      <motion.button
+        whileTap={{ scale: 0.97 }}
+        type="submit"
+        disabled={loading}
+        className="w-full flex items-center justify-center gap-2 p-3 rounded-lg bg-brand-gold text-black font-semibold hover:bg-yellow-400 transition disabled:opacity-60"
+      >
+        {loading ? "Mengirim..." : "Kirim Pesan"}
+        {!loading && <SendHorizonal size={18} />}
+      </motion.button>
+    </motion.form>
+  );
+}
